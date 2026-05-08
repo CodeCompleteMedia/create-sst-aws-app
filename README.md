@@ -94,14 +94,11 @@ easyAwsDeploy/
 # Install dependencies
 pnpm install
 
-# Build everything (UI → CLI → copy assets)
+# Build everything (UI → CLI → copy assets) — required before first dev run
 pnpm build
 
-# Watch CLI for changes
-pnpm dev:cli
-
-# Run UI dev server with HMR (proxies /api to local Fastify server)
-pnpm dev:ui
+# Start all dev processes concurrently (tsup watch + Fastify server + Vite HMR)
+pnpm dev
 
 # Type check all packages
 pnpm typecheck
@@ -111,7 +108,12 @@ pnpm format
 pnpm check
 ```
 
-> When developing the UI, start both `pnpm dev:cli` and `pnpm dev:ui` — the Vite dev server proxies `/api` requests to the Fastify server on port 3847.
+`pnpm dev` runs three processes in parallel:
+- **cli** — tsup in watch mode; rebuilds `packages/cli/dist/` on source change
+- **server** — Fastify server via `node --watch`; restarts automatically when the CLI rebuilds
+- **ui** — Vite dev server on port 5173 with HMR; proxies `/api` requests to the Fastify server on port 3847
+
+> Run `pnpm build` once before `pnpm dev` to ensure `packages/cli/dist/bin.js` exists for the server process to start.
 
 ## Generated project
 

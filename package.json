@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "pnpm --filter @easy-aws-deploy/ui build && pnpm --filter easy-aws-deploy build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public",
-    "dev": "pnpm --filter cli dev",
-    "dev:ui": "pnpm --filter @easy-aws-deploy/ui dev",
+    "dev": "concurrently --names cli,server,ui --prefix-colors blue,green,magenta \"pnpm dev:cli\" \"pnpm dev:server\" \"pnpm dev:ui\"",
     "dev:cli": "pnpm --filter easy-aws-deploy dev",
+    "dev:server": "node --watch --watch-path=packages/cli/dist packages/cli/dist/bin.js ui",
+    "dev:ui": "pnpm --filter @easy-aws-deploy/ui dev",
     "format": "biome format --write .",
     "check": "biome check .",
     "typecheck": "pnpm -r typecheck",
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "concurrently": "^9.2.1",
     "typescript": "^5.7.2"
   },
   "engines": {
