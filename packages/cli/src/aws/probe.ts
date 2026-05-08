@@ -2,8 +2,6 @@ import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
 import { IAMClient, ListOpenIDConnectProvidersCommand, GetRoleCommand } from '@aws-sdk/client-iam';
 import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
 import { fromIni } from '@aws-sdk/credential-providers';
-import type { AwsCredentialIdentityProvider } from '@aws-sdk/client-sts';
-
 export interface CallerIdentity {
   accountId: string;
   userId: string;
@@ -15,7 +13,7 @@ export interface RoleSummary {
   trustPolicy: string;
 }
 
-function credentials(profile?: string): AwsCredentialIdentityProvider | undefined {
+function credentials(profile?: string): ReturnType<typeof fromIni> | undefined {
   return profile ? fromIni({ profile }) : undefined;
 }
 
