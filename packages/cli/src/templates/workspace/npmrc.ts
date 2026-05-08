@@ -1,0 +1,6 @@
+export default `auto-install-peers=true
+strict-peer-dependencies=false
+shared-workspace-lockfile=true
+link-workspace-packages=true
+prefer-workspace-packages=true
+`;

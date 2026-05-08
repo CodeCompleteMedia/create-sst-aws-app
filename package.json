@@ -1,0 +1,25 @@
+{
+  "name": "easy-aws-deploy",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm --filter @easy-aws-deploy/ui build && pnpm --filter easy-aws-deploy build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public",
+    "dev": "pnpm --filter cli dev",
+    "dev:ui": "pnpm --filter @easy-aws-deploy/ui dev",
+    "dev:cli": "pnpm --filter easy-aws-deploy dev",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@10.33.0"
+}

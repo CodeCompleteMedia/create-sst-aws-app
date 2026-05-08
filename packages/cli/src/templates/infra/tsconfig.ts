@@ -1,0 +1,9 @@
+export default `{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "jsx": "react-jsx"
+  },
+  "include": ["sst.config.ts", "src"]
+}
+`;

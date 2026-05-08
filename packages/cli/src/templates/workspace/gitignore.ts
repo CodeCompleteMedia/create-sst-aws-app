@@ -1,0 +1,8 @@
+export default `node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+.env
+.env.local
+packages/infra/.sst/
+`;
