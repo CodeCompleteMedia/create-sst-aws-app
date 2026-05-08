@@ -3,3 +3,7 @@ dist/
 *.tsbuildinfo
 .DS_Store
 .claude/
+
+# Build artifacts copied into the publishable cli package
+packages/cli/LICENSE
+packages/cli/README.md

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm --filter @create-sst-aws-app/ui build && pnpm --filter create-sst-aws-app build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public",
+    "build": "pnpm --filter @create-sst-aws-app/ui build && pnpm --filter create-sst-aws-app build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public && cp LICENSE README.md packages/cli/",
     "dev": "concurrently --names cli,server,ui --prefix-colors blue,green,magenta \"pnpm dev:cli\" \"pnpm dev:server\" \"pnpm dev:ui\"",
     "dev:cli": "pnpm --filter create-sst-aws-app dev",
     "dev:server": "node --watch --watch-path=packages/cli/dist packages/cli/dist/bin.js ui",

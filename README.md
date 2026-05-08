@@ -116,6 +116,27 @@ pnpm check
 
 > Run `pnpm build` once before `pnpm dev` so `packages/cli/dist/bin.js` exists for the server process to start.
 
+## Releasing
+
+The CLI is published to npm via a GitHub Actions workflow that triggers on `v*` git tags.
+
+**One-time setup:**
+1. Create an [npm automation token](https://docs.npmjs.com/creating-and-viewing-access-tokens)
+2. Add it to the GitHub repo as a secret named `NPM_TOKEN`
+
+**For each release:**
+```bash
+# 1. Bump version in packages/cli/package.json
+# 2. Commit the bump
+git commit -am "Release v0.2.0"
+
+# 3. Tag and push
+git tag v0.2.0
+git push origin main --tags
+```
+
+The release workflow validates that the tag matches the `package.json` version, runs `pnpm build`, and publishes with [npm provenance](https://docs.npmjs.com/generating-provenance-statements). Manual publishing is also supported (`pnpm build && cd packages/cli && npm publish`); the `prepublishOnly` script ensures the build runs first either way.
+
 ## License
 
 MIT

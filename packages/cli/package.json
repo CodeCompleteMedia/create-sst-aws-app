@@ -6,11 +6,43 @@
   "bin": {
     "create-sst-aws-app": "./dist/bin.js"
   },
-  "files": ["dist"],
+  "files": ["dist", "LICENSE", "README.md"],
+  "keywords": [
+    "sst",
+    "aws",
+    "scaffolding",
+    "starter",
+    "cognito",
+    "dynamodb",
+    "cloudfront",
+    "kms",
+    "multi-tenant",
+    "oidc",
+    "github-actions",
+    "create-app"
+  ],
+  "author": "Matthew Higley <matt@codecompletemedia.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/codecompletemedia/create-sst-aws-app#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codecompletemedia/create-sst-aws-app.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/codecompletemedia/create-sst-aws-app/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup src/bin.ts --format esm --target node20 --outDir dist --clean",
     "dev": "tsup src/bin.ts --format esm --watch --outDir dist",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm -w build"
   },
   "dependencies": {
     "cac": "^6.7.14",

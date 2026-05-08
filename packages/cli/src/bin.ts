@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { cac } from 'cac';
 import { runInit } from './commands/init.js';
 import { red } from './wizard/printer.js';
