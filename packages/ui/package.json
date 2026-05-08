@@ -1,5 +1,5 @@
 {
-  "name": "@easy-aws-deploy/ui",
+  "name": "@create-sst-aws-app/ui",
   "version": "0.1.0",
   "private": true,
   "type": "module",

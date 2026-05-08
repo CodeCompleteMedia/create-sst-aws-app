@@ -50,7 +50,7 @@ jobs:
         with:
           # Role ARN for github-actions-deployer.
           # Trust policy is scoped to: repo:{{GITHUB_ORG_REPO}}:ref:refs/heads/{{GITHUB_BRANCH}}
-          # Run: easy-aws-deploy setup aws --repo {{GITHUB_ORG_REPO}} to verify this role exists.
+          # Run: npx create-sst-aws-app setup-aws --repo {{GITHUB_ORG_REPO}} to verify this role exists.
           role-to-assume: {{OIDC_ROLE_ARN}}
           aws-region: {{AWS_REGION}}
 

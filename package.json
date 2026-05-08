@@ -1,14 +1,14 @@
 {
-  "name": "easy-aws-deploy",
+  "name": "create-sst-aws-app-workspace",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm --filter @easy-aws-deploy/ui build && pnpm --filter easy-aws-deploy build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public",
+    "build": "pnpm --filter @create-sst-aws-app/ui build && pnpm --filter create-sst-aws-app build && mkdir -p packages/cli/dist/public && cp -r packages/ui/dist/. packages/cli/dist/public",
     "dev": "concurrently --names cli,server,ui --prefix-colors blue,green,magenta \"pnpm dev:cli\" \"pnpm dev:server\" \"pnpm dev:ui\"",
-    "dev:cli": "pnpm --filter easy-aws-deploy dev",
+    "dev:cli": "pnpm --filter create-sst-aws-app dev",
     "dev:server": "node --watch --watch-path=packages/cli/dist packages/cli/dist/bin.js ui",
-    "dev:ui": "pnpm --filter @easy-aws-deploy/ui dev",
+    "dev:ui": "pnpm --filter @create-sst-aws-app/ui dev",
     "format": "biome format --write .",
     "check": "biome check .",
     "typecheck": "pnpm -r typecheck",

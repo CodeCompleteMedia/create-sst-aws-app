@@ -91,7 +91,7 @@ export function App() {
       <aside style={styles.sidebar}>
         <div style={styles.logoArea}>
           <span style={styles.logoIcon}>☁</span>
-          <div style={styles.logoText}>easy-aws-deploy</div>
+          <div style={styles.logoText}>create-sst-aws-app</div>
           <div style={styles.logoSub}>AWS deployment toolkit</div>
         </div>
         <nav style={styles.nav}>

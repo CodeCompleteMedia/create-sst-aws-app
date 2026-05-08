@@ -1,10 +1,10 @@
 {
-  "name": "easy-aws-deploy",
+  "name": "create-sst-aws-app",
   "version": "0.1.0",
-  "description": "CLI to scaffold SST v3 projects with production-grade AWS patterns",
+  "description": "Scaffold an SST v3 project on AWS with production-grade patterns (Cognito + KMS auth, multi-tenancy, GitHub OIDC)",
   "type": "module",
   "bin": {
-    "easy-aws-deploy": "./dist/bin.js"
+    "create-sst-aws-app": "./dist/bin.js"
   },
   "files": ["dist"],
   "scripts": {

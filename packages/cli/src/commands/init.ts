@@ -14,12 +14,13 @@ export interface InitOptions {
 }
 
 export async function runInit(rawName: string, opts: InitOptions): Promise<void> {
-  const projectName = slugify(rawName);
+  const initialName = slugify(rawName) || 'my-app';
 
-  console.log(`\n${bold(cyan('easy-aws-deploy init'))}`);
-  console.log(dim(`Scaffolding ${bold(projectName)} with production-grade AWS patterns\n`));
+  console.log(`\n${bold(cyan('create-sst-aws-app'))}`);
+  console.log(dim('Scaffolding an SST v3 project with production-grade AWS patterns\n'));
 
-  const vars = opts.yes ? defaultVars(projectName) : await runWizard(projectName);
+  const vars = opts.yes ? defaultVars(initialName) : await runWizard(initialName);
+  const projectName = vars.projectName;
 
   const dest = resolve(process.cwd(), projectName);
   if (existsSync(dest) && !opts.dryRun) {
@@ -231,7 +232,7 @@ function printNextSteps(projectName: string, vars: TemplateVars): void {
   console.log(`  ${dim('1.')} cd ${projectName}`);
   console.log(`  ${dim('2.')} pnpm install`);
   console.log(
-    `  ${dim('3.')} easy-aws-deploy setup-aws${vars.githubOrgRepo ? ` --project ${projectName} --repo ${vars.githubOrgRepo}` : ''}`,
+    `  ${dim('3.')} npx create-sst-aws-app setup-aws${vars.githubOrgRepo ? ` --project ${projectName} --repo ${vars.githubOrgRepo}` : ''}`,
   );
   console.log(`  ${dim('4.')} pnpm sst deploy --stage dev`);
   if (vars.hasCognito) {

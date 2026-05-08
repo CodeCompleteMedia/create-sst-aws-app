@@ -74,7 +74,7 @@ export function DeployGuide() {
           <strong style={{ color: '#e2e8f0' }}>AWS Setup</strong> tab to run live checks, or run
           from the terminal:
         </p>
-        <CodeBlock code="easy-aws-deploy setup-aws --project my-project --repo your-org/your-repo" />
+        <CodeBlock code="npx create-sst-aws-app setup-aws --project my-project --repo your-org/your-repo" />
         <p style={bodyText}>
           Fix any failing steps before continuing. All 7 checks should be green (or warned with no
           blockers).

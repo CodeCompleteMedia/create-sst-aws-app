@@ -155,7 +155,7 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
         });
       }
     } else {
-      const fix = `# Trust policy:\n${JSON.stringify(oidcTrustPolicy(accountId, repo, branch), null, 2)}\n\n# Inline policy: see easy-aws-deploy setup-aws output`;
+      const fix = `# Trust policy:\n${JSON.stringify(oidcTrustPolicy(accountId, repo, branch), null, 2)}\n\n# Inline policy: see \`npx create-sst-aws-app setup-aws\` output`;
       send({
         step: 5,
         title: 'IAM Deployer Role',

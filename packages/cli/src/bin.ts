@@ -2,17 +2,14 @@ import { cac } from 'cac';
 import { runInit } from './commands/init.js';
 import { red } from './wizard/printer.js';
 
-const cli = cac('easy-aws-deploy');
+const cli = cac('create-sst-aws-app');
 
 cli
-  .command(
-    'init <project-name>',
-    'Scaffold a new SST v3 project with production-grade AWS patterns',
-  )
+  .command('[project-name]', 'Scaffold a new SST v3 project with production-grade AWS patterns')
   .option('--dry-run', 'Show what would be generated without writing files')
   .option('-y, --yes', 'Accept all defaults (non-interactive)')
-  .action(async (projectName: string, options: { dryRun?: boolean; yes?: boolean }) => {
-    await runInit(projectName, { dryRun: options.dryRun, yes: options.yes }).catch(fail);
+  .action(async (projectName: string | undefined, options: { dryRun?: boolean; yes?: boolean }) => {
+    await runInit(projectName ?? '', { dryRun: options.dryRun, yes: options.yes }).catch(fail);
   });
 
 cli
@@ -22,12 +19,7 @@ cli
   .option('--repo <org/repo>', 'GitHub org/repo (used for trust policy verification)')
   .option('--branch <branch>', 'Production branch', { default: 'main' })
   .action(
-    async (options: {
-      profile?: string;
-      project?: string;
-      repo?: string;
-      branch?: string;
-    }) => {
+    async (options: { profile?: string; project?: string; repo?: string; branch?: string }) => {
       const { runSetupAws: run } = await import('./commands/setup-aws.js');
       await run({
         profile: options.profile,

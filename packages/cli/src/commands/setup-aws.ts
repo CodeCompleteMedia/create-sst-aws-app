@@ -35,7 +35,7 @@ export async function runSetupAws(opts: SetupAwsOptions): Promise<void> {
   const githubOrgRepo = opts.githubOrgRepo ?? 'your-org/your-repo';
   const githubBranch = opts.githubBranch ?? 'main';
 
-  console.log(`\n${bold(cyan('easy-aws-deploy setup aws'))}`);
+  console.log(`\n${bold(cyan('create-sst-aws-app setup-aws'))}`);
   console.log(dim(`Checking AWS prerequisites for ${projectName}...\n`));
 
   // Step 1 — AWS CLI
