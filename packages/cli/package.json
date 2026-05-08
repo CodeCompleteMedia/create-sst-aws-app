@@ -23,14 +23,14 @@
   ],
   "author": "Matthew Higley <matt@codecompletemedia.com>",
   "license": "MIT",
-  "homepage": "https://github.com/codecompletemedia/create-sst-aws-app#readme",
+  "homepage": "https://github.com/CodeCompleteMedia/create-sst-aws-app#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/codecompletemedia/create-sst-aws-app.git",
+    "url": "git+https://github.com/CodeCompleteMedia/create-sst-aws-app.git",
     "directory": "packages/cli"
   },
   "bugs": {
-    "url": "https://github.com/codecompletemedia/create-sst-aws-app/issues"
+    "url": "https://github.com/CodeCompleteMedia/create-sst-aws-app/issues"
   },
   "engines": {
     "node": ">=20"
