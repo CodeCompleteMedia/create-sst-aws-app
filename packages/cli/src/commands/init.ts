@@ -1,11 +1,12 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { ask, slugify } from '../wizard/prompt.js';
-import { render } from '../renderer/template-engine.js';
 import { writeFiles } from '../renderer/file-writer.js';
-import { bold, cyan, dim, green, header } from '../wizard/printer.js';
+import { render } from '../renderer/template-engine.js';
 import { getTemplates } from '../templates/index.js';
-import type { TemplateVars, AuthStrategy, ProjectType } from '../types.js';
+import type { AuthStrategy, ProjectType, TemplateVars, TenantIsolation } from '../types.js';
+import { buildVars, slugify } from '../vars.js';
+import { bold, cyan, dim, green, header } from '../wizard/printer.js';
+import { ask } from '../wizard/prompt.js';
 
 export interface InitOptions {
   dryRun?: boolean;
@@ -24,7 +25,7 @@ export async function runInit(rawName: string, opts: InitOptions): Promise<void>
   if (existsSync(dest) && !opts.dryRun) {
     console.log(`\n  Directory ${bold(projectName)} already exists.`);
     const { overwrite } = await ask({ type: 'confirm', name: 'overwrite', message: 'Overwrite?' });
-    if (!overwrite) process.exit(0);
+    if (!overwrite) process.exit(1);
   }
 
   header('Generating files');
@@ -116,7 +117,10 @@ async function runWizard(projectName: string): Promise<TemplateVars> {
         name: 'tenantIsolation',
         message: 'Tenant isolation model',
         choices: [
-          { title: 'Single-table DynamoDB  (pk: TENANT#<id>) — recommended', value: 'single-table' },
+          {
+            title: 'Single-table DynamoDB  (pk: TENANT#<id>) — recommended',
+            value: 'single-table',
+          },
           { title: 'Separate tables per tenant', value: 'separate-tables' },
         ],
         initial: 0,
@@ -136,7 +140,9 @@ async function runWizard(projectName: string): Promise<TemplateVars> {
     if (tenantChoices.expectedTenantCount === '75+') {
       console.log(
         dim('\n  Note: 75+ tenants exceeds CloudFront SAN cert limits per distribution.') +
-        dim('\n  The generated config handles <75. You will need to shard by distribution at scale.\n'),
+          dim(
+            '\n  The generated config handles <75. You will need to shard by distribution at scale.\n',
+          ),
       );
     }
   }
@@ -192,7 +198,7 @@ async function runWizard(projectName: string): Promise<TemplateVars> {
     projectType: String(phase1.projectType ?? 'cms') as ProjectType,
     authStrategy,
     editorDomain: String(phase2.editorDomain ?? ''),
-    tenantIsolation: String(tenantChoices.tenantIsolation ?? 'single-table') as 'single-table' | 'separate-tables',
+    tenantIsolation: String(tenantChoices.tenantIsolation ?? 'single-table') as TenantIsolation,
     expectedTenantCount: String(tenantChoices.expectedTenantCount ?? '<75') as '<75' | '75+',
     githubOrgRepo: String(phase4.githubOrgRepo ?? ''),
     githubBranch: String(phase4.githubBranch ?? 'main'),
@@ -219,62 +225,22 @@ function defaultVars(projectName: string): TemplateVars {
   });
 }
 
-interface RawVars {
-  projectName: string;
-  awsRegion: string;
-  projectType: ProjectType;
-  authStrategy: AuthStrategy;
-  editorDomain: string;
-  tenantIsolation: 'single-table' | 'separate-tables';
-  expectedTenantCount: '<75' | '75+';
-  githubOrgRepo: string;
-  githubBranch: string;
-  devAccountId: string;
-  prodAccountId: string;
-  generateStaging: boolean;
-}
-
-function buildVars(raw: RawVars): TemplateVars {
-  const hasKmsAuth = raw.authStrategy === 'cognito-kms';
-  const hasCognito = raw.authStrategy === 'cognito-kms' || raw.authStrategy === 'cognito';
-  const enableMultiTenancy = raw.projectType === 'cms';
-  const hasCloudFront = raw.projectType === 'cms' || raw.projectType === 'api';
-  const oidcRoleArn = raw.devAccountId
-    ? `arn:aws:iam::${raw.devAccountId}:role/github-actions-deployer`
-    : 'arn:aws:iam::YOUR_ACCOUNT_ID:role/github-actions-deployer';
-
-  return {
-    projectName: raw.projectName,
-    projectNameUpper: raw.projectName.toUpperCase().replace(/-/g, '_'),
-    awsRegion: raw.awsRegion,
-    devAccountId: raw.devAccountId,
-    prodAccountId: raw.prodAccountId,
-    githubOrgRepo: raw.githubOrgRepo,
-    githubBranch: raw.githubBranch,
-    oidcRoleArn,
-    projectType: raw.projectType,
-    authStrategy: raw.authStrategy,
-    tenantIsolation: raw.tenantIsolation,
-    enableMultiTenancy,
-    hasKmsAuth,
-    hasCognito,
-    hasCloudFront,
-    generateStaging: raw.generateStaging,
-    editorDomain: raw.editorDomain,
-    expectedTenantCount: raw.expectedTenantCount,
-  };
-}
-
 function printNextSteps(projectName: string, vars: TemplateVars): void {
   console.log(`\n${bold(green('✓'))} ${bold(`Created ${projectName}/`)}\n`);
   console.log(bold('Next steps:\n'));
   console.log(`  ${dim('1.')} cd ${projectName}`);
   console.log(`  ${dim('2.')} pnpm install`);
-  console.log(`  ${dim('3.')} easy-aws-deploy setup-aws${vars.githubOrgRepo ? ` --project ${projectName} --repo ${vars.githubOrgRepo}` : ''}`);
+  console.log(
+    `  ${dim('3.')} easy-aws-deploy setup-aws${vars.githubOrgRepo ? ` --project ${projectName} --repo ${vars.githubOrgRepo}` : ''}`,
+  );
   console.log(`  ${dim('4.')} pnpm sst deploy --stage dev`);
   if (vars.hasCognito) {
-    console.log(`  ${dim('5.')} Copy the editor URL from deploy output, set as ${vars.projectNameUpper}_EDITOR_URL`);
-    console.log(`  ${dim('6.')} pnpm sst deploy --stage dev  (second pass — wires Cognito callback)`);
+    console.log(
+      `  ${dim('5.')} Copy the editor URL from deploy output, set as ${vars.projectNameUpper}_EDITOR_URL`,
+    );
+    console.log(
+      `  ${dim('6.')} pnpm sst deploy --stage dev  (second pass — wires Cognito callback)`,
+    );
   }
   console.log();
 }

@@ -2,9 +2,25 @@ import { execSync } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { getCallerIdentity, findOidcProvider, getIamRole, listBucketsWithPrefix } from '../aws/probe.js';
-import { oidcTrustPolicy, deployerRoleInlinePolicy } from '../aws/iam-docs.js';
-import { header, pass, fail, warn, info, instruction, bold, dim, red, cyan } from '../wizard/printer.js';
+import { deployerRoleInlinePolicy, oidcTrustPolicy } from '../aws/iam-docs.js';
+import {
+  findOidcProvider,
+  getCallerIdentity,
+  getIamRole,
+  listBucketsWithPrefix,
+} from '../aws/probe.js';
+import {
+  bold,
+  cyan,
+  dim,
+  fail,
+  header,
+  info,
+  instruction,
+  pass,
+  red,
+  warn,
+} from '../wizard/printer.js';
 
 export interface SetupAwsOptions {
   profile?: string;
@@ -29,7 +45,10 @@ export async function runSetupAws(opts: SetupAwsOptions): Promise<void> {
     pass('AWS CLI installed', cliVersion);
   } else {
     fail('AWS CLI not found');
-    instruction('Install AWS CLI', 'https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html');
+    instruction(
+      'Install AWS CLI',
+      'https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html',
+    );
     console.log(red('  Cannot continue without AWS CLI. Install it and re-run.\n'));
     process.exit(1);
   }
@@ -142,21 +161,13 @@ export async function runSetupAws(opts: SetupAwsOptions): Promise<void> {
         '  Audience: sts.amazonaws.com',
         '',
         'Paste this trust policy (customized for your repo):',
-        JSON.stringify(
-          oidcTrustPolicy(identity.accountId, githubOrgRepo, githubBranch),
-          null,
-          2,
-        )
+        JSON.stringify(oidcTrustPolicy(identity.accountId, githubOrgRepo, githubBranch), null, 2)
           .split('\n')
           .map((l) => `  ${l}`)
           .join('\n'),
         '',
         'Then attach this inline policy:',
-        JSON.stringify(
-          deployerRoleInlinePolicy(identity.accountId, projectName),
-          null,
-          2,
-        )
+        JSON.stringify(deployerRoleInlinePolicy(identity.accountId, projectName), null, 2)
           .split('\n')
           .map((l) => `  ${l}`)
           .join('\n'),
@@ -171,16 +182,13 @@ export async function runSetupAws(opts: SetupAwsOptions): Promise<void> {
     pass('SST bootstrap bucket found', sstBuckets[0]);
   } else {
     fail('SST bootstrap bucket not found');
-    instruction(
-      'Bootstrap SST',
-      `cd ${projectName}\npnpm sst bootstrap --stage dev`,
-    );
+    instruction('Bootstrap SST', `cd ${projectName}\npnpm sst bootstrap --stage dev`);
   }
 
   // Step 7 — ACM region reminder
   header('Step 7 — ACM certificate region (CloudFront)');
   warn('CloudFront certificates MUST be in us-east-1, even if your app is in another region');
-  info(`Your primary region: us-west-2`);
+  info('Your primary region: us-west-2');
   info('The generated sst.config.ts handles this with an explicit us-east-1 ACM provider.');
   info('No action needed — this is just a reminder for when you wire custom domains.');
 
@@ -194,7 +202,7 @@ function getAwsCliVersion(): string | null {
   try {
     const out = execSync('aws --version 2>&1', { encoding: 'utf8' });
     const match = out.match(/aws-cli\/([\d.]+)/);
-    return match ? `v${match[1]}` : out.trim().split('\n')[0] ?? null;
+    return match ? `v${match[1]}` : (out.trim().split('\n')[0] ?? null);
   } catch {
     return null;
   }

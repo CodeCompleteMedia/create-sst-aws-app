@@ -1,55 +1,54 @@
-import type { FastifyPluginAsync } from 'fastify';
 import archiver from 'archiver';
-import { getTemplates } from '../../templates/index.js';
+import type { FastifyPluginAsync } from 'fastify';
 import { render } from '../../renderer/template-engine.js';
-import type { TemplateVars } from '../../types.js';
+import { getTemplates } from '../../templates/index.js';
+import { buildVars, rawVarsFromInput } from '../../vars.js';
+
+const generateBodySchema = {
+  type: 'object',
+  additionalProperties: true,
+  properties: {
+    projectName: { type: 'string', maxLength: 100 },
+    awsRegion: { type: 'string', maxLength: 30 },
+    projectType: { type: 'string', enum: ['cms', 'api', 'static'] },
+    authStrategy: { type: 'string', enum: ['cognito-kms', 'cognito', 'none'] },
+    tenantIsolation: { type: 'string', enum: ['single-table', 'separate-tables'] },
+    expectedTenantCount: { type: 'string', enum: ['<75', '75+'] },
+    editorDomain: { type: 'string', maxLength: 253 },
+    githubOrgRepo: { type: 'string', maxLength: 100 },
+    githubBranch: { type: 'string', maxLength: 100 },
+    devAccountId: { type: 'string', maxLength: 12 },
+    prodAccountId: { type: 'string', maxLength: 12 },
+    generateStaging: { type: 'boolean' },
+  },
+} as const;
 
 export const projectRoutes: FastifyPluginAsync = async (app) => {
-  app.post('/project/generate', async (req, reply) => {
-    const body = req.body as Record<string, unknown>;
+  app.post(
+    '/project/generate',
+    {
+      schema: { body: generateBodySchema },
+      bodyLimit: 16 * 1024,
+    },
+    async (req, reply) => {
+      const raw = rawVarsFromInput(req.body as Record<string, unknown>);
+      const vars = buildVars(raw);
+      const templates = getTemplates(vars);
 
-    const projectName = String(body.projectName ?? 'my-project').toLowerCase().replace(/\s+/g, '-');
-    const authStrategy = (body.authStrategy as 'cognito-kms' | 'cognito' | 'none') ?? 'none';
-    const projectType = (body.projectType as 'cms' | 'api' | 'static') ?? 'api';
+      reply.raw.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': `attachment; filename="${vars.projectName}.zip"`,
+      });
 
-    const vars: TemplateVars = {
-      projectName,
-      projectNameUpper: projectName.toUpperCase().replace(/-/g, '_'),
-      awsRegion: String(body.awsRegion ?? 'us-west-2'),
-      devAccountId: String(body.devAccountId ?? ''),
-      prodAccountId: String(body.prodAccountId ?? '') || String(body.devAccountId ?? ''),
-      githubOrgRepo: String(body.githubOrgRepo ?? ''),
-      githubBranch: String(body.githubBranch ?? 'main'),
-      oidcRoleArn: body.devAccountId
-        ? `arn:aws:iam::${body.devAccountId}:role/github-actions-deployer`
-        : 'arn:aws:iam::YOUR_ACCOUNT_ID:role/github-actions-deployer',
-      projectType,
-      authStrategy,
-      tenantIsolation: (body.tenantIsolation as 'single-table' | 'separate-tables') ?? 'single-table',
-      enableMultiTenancy: projectType === 'cms',
-      hasKmsAuth: authStrategy === 'cognito-kms',
-      hasCognito: authStrategy === 'cognito-kms' || authStrategy === 'cognito',
-      hasCloudFront: projectType === 'cms' || projectType === 'api',
-      generateStaging: Boolean(body.generateStaging),
-      editorDomain: String(body.editorDomain ?? ''),
-      expectedTenantCount: (body.expectedTenantCount as '<75' | '75+') ?? '<75',
-    };
+      const archive = archiver('zip', { zlib: { level: 9 } });
+      archive.pipe(reply.raw);
 
-    const templates = getTemplates(vars);
+      for (const t of templates) {
+        const content = render(t.template, vars);
+        archive.append(content, { name: `${vars.projectName}/${t.outputPath}` });
+      }
 
-    reply.raw.writeHead(200, {
-      'Content-Type': 'application/zip',
-      'Content-Disposition': `attachment; filename="${projectName}.zip"`,
-    });
-
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    archive.pipe(reply.raw);
-
-    for (const t of templates) {
-      const content = render(t.template, vars);
-      archive.append(content, { name: `${projectName}/${t.outputPath}` });
-    }
-
-    await archive.finalize();
-  });
+      await archive.finalize();
+    },
+  );
 };

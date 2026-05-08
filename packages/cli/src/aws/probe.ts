@@ -1,6 +1,6 @@
-import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
-import { IAMClient, ListOpenIDConnectProvidersCommand, GetRoleCommand } from '@aws-sdk/client-iam';
-import { S3Client, ListBucketsCommand } from '@aws-sdk/client-s3';
+import { GetRoleCommand, IAMClient, ListOpenIDConnectProvidersCommand } from '@aws-sdk/client-iam';
+import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
+import { GetCallerIdentityCommand, STSClient } from '@aws-sdk/client-sts';
 import { fromIni } from '@aws-sdk/credential-providers';
 export interface CallerIdentity {
   accountId: string;
@@ -17,9 +17,7 @@ function credentials(profile?: string): ReturnType<typeof fromIni> | undefined {
   return profile ? fromIni({ profile }) : undefined;
 }
 
-export async function getCallerIdentity(
-  profile?: string,
-): Promise<CallerIdentity | null> {
+export async function getCallerIdentity(profile?: string): Promise<CallerIdentity | null> {
   try {
     const client = new STSClient({ credentials: credentials(profile) });
     const out = await client.send(new GetCallerIdentityCommand({}));
@@ -49,10 +47,7 @@ export async function findOidcProvider(
   }
 }
 
-export async function getIamRole(
-  roleName: string,
-  profile?: string,
-): Promise<RoleSummary | null> {
+export async function getIamRole(roleName: string, profile?: string): Promise<RoleSummary | null> {
   try {
     const client = new IAMClient({ credentials: credentials(profile) });
     const out = await client.send(new GetRoleCommand({ RoleName: roleName }));
@@ -67,16 +62,11 @@ export async function getIamRole(
   }
 }
 
-export async function listBucketsWithPrefix(
-  prefix: string,
-  profile?: string,
-): Promise<string[]> {
+export async function listBucketsWithPrefix(prefix: string, profile?: string): Promise<string[]> {
   try {
     const client = new S3Client({ credentials: credentials(profile) });
     const out = await client.send(new ListBucketsCommand({}));
-    return (out.Buckets ?? [])
-      .map((b) => b.Name ?? '')
-      .filter((name) => name.startsWith(prefix));
+    return (out.Buckets ?? []).map((b) => b.Name ?? '').filter((name) => name.startsWith(prefix));
   } catch {
     return [];
   }

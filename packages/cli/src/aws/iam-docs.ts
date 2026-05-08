@@ -1,8 +1,4 @@
-export function oidcTrustPolicy(
-  accountId: string,
-  orgRepo: string,
-  branch: string,
-): object {
+export function oidcTrustPolicy(accountId: string, orgRepo: string, branch: string): object {
   return {
     Version: '2012-10-17',
     Statement: [
@@ -25,10 +21,7 @@ export function oidcTrustPolicy(
   };
 }
 
-export function deployerRoleInlinePolicy(
-  accountId: string,
-  projectName: string,
-): object {
+export function deployerRoleInlinePolicy(accountId: string, projectName: string): object {
   return {
     Version: '2012-10-17',
     Statement: [
@@ -36,10 +29,7 @@ export function deployerRoleInlinePolicy(
         Sid: 'SSTBootstrap',
         Effect: 'Allow',
         Action: ['s3:GetObject', 's3:PutObject', 's3:ListBucket'],
-        Resource: [
-          `arn:aws:s3:::sst-asset-*`,
-          `arn:aws:s3:::sst-asset-*/*`,
-        ],
+        Resource: ['arn:aws:s3:::sst-asset-*', 'arn:aws:s3:::sst-asset-*/*'],
       },
       {
         Sid: 'CloudFormationDeploy',

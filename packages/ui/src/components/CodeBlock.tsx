@@ -26,6 +26,7 @@ export function CodeBlock({ code }: CodeBlockProps) {
       }}
     >
       <button
+        type="button"
         onClick={handleCopy}
         style={{
           position: 'absolute',

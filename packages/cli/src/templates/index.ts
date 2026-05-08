@@ -1,25 +1,25 @@
 import type { TemplateVars } from '../types.js';
 
+import biomeConfig from './workspace/biome.js';
+import gitignore from './workspace/gitignore.js';
+import npmrc from './workspace/npmrc.js';
+import pnpmWorkspace from './workspace/pnpm-workspace.js';
 // Workspace
 import rootPackageJson from './workspace/root-package-json.js';
-import pnpmWorkspace from './workspace/pnpm-workspace.js';
 import tsconfigBase from './workspace/tsconfig-base.js';
-import biomeConfig from './workspace/biome.js';
-import npmrc from './workspace/npmrc.js';
-import gitignore from './workspace/gitignore.js';
 
-// Infrastructure
-import sstConfig from './sst/sst-config.js';
 import infraPackageJson from './infra/package-json.js';
 import infraTsconfig from './infra/tsconfig.js';
+// Infrastructure
+import sstConfig from './sst/sst-config.js';
 
 // Server package
 import serverPackageJson from './server/package-json.js';
 import serverTsconfig from './server/tsconfig.js';
 
+import cognito from './auth/cognito.js';
 // Auth
 import kmsJwt from './auth/kms-jwt.js';
-import cognito from './auth/cognito.js';
 
 // API handler
 import apiHandler from './api/handler.js';

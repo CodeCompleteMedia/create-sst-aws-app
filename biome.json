@@ -23,6 +23,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "include": ["packages/ui/**/*.tsx"],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noLabelWithoutControl": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "single",

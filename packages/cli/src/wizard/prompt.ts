@@ -10,10 +10,3 @@ export async function ask<T extends string = string>(
   const onCancel = opts.onCancel ?? (() => process.exit(0));
   return prompts(questions as PromptObject[], { onCancel }) as Promise<Record<T, unknown>>;
 }
-
-export function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}

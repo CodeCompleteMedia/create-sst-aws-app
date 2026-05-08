@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { StatusBadge } from './StatusBadge.js';
 import { CodeBlock } from './CodeBlock.js';
+import { StatusBadge } from './StatusBadge.js';
 
 type Status = 'pass' | 'fail' | 'warn' | 'pending' | 'running';
 
@@ -68,6 +68,7 @@ export function StepCard({ step, title, status, description, fix }: StepCardProp
       {fix && (status === 'fail' || status === 'warn') && (
         <div style={{ marginTop: 12, paddingLeft: 42 }}>
           <button
+            type="button"
             onClick={() => setFixOpen((o) => !o)}
             style={{
               background: 'none',

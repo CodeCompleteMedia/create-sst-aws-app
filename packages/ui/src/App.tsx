@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Prerequisites } from './pages/Prerequisites.js';
-import { InitWizard } from './pages/InitWizard.js';
 import { DeployGuide } from './pages/DeployGuide.js';
+import { InitWizard } from './pages/InitWizard.js';
+import { Prerequisites } from './pages/Prerequisites.js';
 
 type View = 'prerequisites' | 'init' | 'guide';
 
@@ -96,14 +96,15 @@ export function App() {
         </div>
         <nav style={styles.nav}>
           {NAV_ITEMS.map((item) => (
-            <div
+            <button
+              type="button"
               key={item.id}
               style={styles.navItem(view === item.id)}
               onClick={() => setView(item.id)}
             >
               <span style={styles.navIcon}>{item.icon}</span>
               {item.label}
-            </div>
+            </button>
           ))}
         </nav>
         <div style={styles.version}>v0.1.0</div>

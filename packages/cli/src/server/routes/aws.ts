@@ -1,20 +1,29 @@
-import type { FastifyPluginAsync } from 'fastify';
-import { getCallerIdentity, findOidcProvider, getIamRole, listBucketsWithPrefix } from '../../aws/probe.js';
 import { execSync } from 'node:child_process';
-import { oidcTrustPolicy } from '../../aws/iam-docs.js';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
+import type { FastifyPluginAsync } from 'fastify';
+import { oidcTrustPolicy } from '../../aws/iam-docs.js';
+import {
+  findOidcProvider,
+  getCallerIdentity,
+  getIamRole,
+  listBucketsWithPrefix,
+} from '../../aws/probe.js';
 
 export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
   app.get('/aws/check', async (req, reply) => {
-    const query = req.query as { project?: string; repo?: string; branch?: string; profile?: string };
+    const query = req.query as {
+      project?: string;
+      repo?: string;
+      branch?: string;
+      profile?: string;
+    };
     const { project = 'my-project', repo = '', branch = 'main', profile } = query;
 
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
+      Connection: 'keep-alive',
     });
 
     const send = (data: object) => {
@@ -45,7 +54,12 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
     const identity = await getCallerIdentity(profile);
     if (identity) {
       accountId = identity.accountId;
-      send({ step: 2, title: 'AWS Credentials', status: 'pass', description: `Account: ${accountId} | ARN: ${identity.arn}` });
+      send({
+        step: 2,
+        title: 'AWS Credentials',
+        status: 'pass',
+        description: `Account: ${accountId} | ARN: ${identity.arn}`,
+      });
     } else {
       send({
         step: 2,
@@ -63,7 +77,12 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
       const creds = readFileSync(`${homedir()}/.aws/credentials`, 'utf8');
       const profileName = profile ?? project;
       if (creds.includes(`[${profileName}]`)) {
-        send({ step: 3, title: 'Named Profile', status: 'pass', description: `Profile [${profileName}] found in ~/.aws/credentials` });
+        send({
+          step: 3,
+          title: 'Named Profile',
+          status: 'pass',
+          description: `Profile [${profileName}] found in ~/.aws/credentials`,
+        });
       } else {
         send({
           step: 3,
@@ -79,7 +98,7 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
         title: 'Named Profile',
         status: 'warn',
         description: 'Could not read ~/.aws/credentials',
-        fix: 'aws configure --profile ' + (profile ?? project),
+        fix: `aws configure --profile ${profile ?? project}`,
       });
     }
 
@@ -87,10 +106,22 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
     const oidcIssuer = 'https://token.actions.githubusercontent.com';
     const oidcArn = await findOidcProvider(oidcIssuer, profile);
     if (oidcArn) {
-      send({ step: 4, title: 'GitHub OIDC Provider', status: 'pass', description: `OIDC provider found: ${oidcArn}` });
+      send({
+        step: 4,
+        title: 'GitHub OIDC Provider',
+        status: 'pass',
+        description: `OIDC provider found: ${oidcArn}`,
+      });
     } else {
-      const fix = `aws iam create-open-id-connect-provider \\\n  --url https://token.actions.githubusercontent.com \\\n  --client-id-list sts.amazonaws.com \\\n  --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1`;
-      send({ step: 4, title: 'GitHub OIDC Provider', status: 'fail', description: 'GitHub OIDC provider not configured', fix });
+      const fix =
+        'aws iam create-open-id-connect-provider \\\n  --url https://token.actions.githubusercontent.com \\\n  --client-id-list sts.amazonaws.com \\\n  --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1';
+      send({
+        step: 4,
+        title: 'GitHub OIDC Provider',
+        status: 'fail',
+        description: 'GitHub OIDC provider not configured',
+        fix,
+      });
     }
 
     // Step 5: IAM Role
@@ -100,7 +131,11 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
       const stmt = (trustDoc?.Statement as Array<Record<string, unknown>>)?.[0];
       const condition = stmt?.Condition as Record<string, Record<string, unknown>> | undefined;
       const subCondition = condition?.StringLike?.['token.actions.githubusercontent.com:sub'];
-      const subs = Array.isArray(subCondition) ? subCondition as string[] : (subCondition ? [String(subCondition)] : []);
+      const subs = Array.isArray(subCondition)
+        ? (subCondition as string[])
+        : subCondition
+          ? [String(subCondition)]
+          : [];
       const expectedSub = repo ? `repo:${repo}:ref:refs/heads/${branch}` : null;
       const subOk = !expectedSub || subs.includes(expectedSub);
       if (subOk) {
@@ -121,13 +156,24 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
       }
     } else {
       const fix = `# Trust policy:\n${JSON.stringify(oidcTrustPolicy(accountId, repo, branch), null, 2)}\n\n# Inline policy: see easy-aws-deploy setup-aws output`;
-      send({ step: 5, title: 'IAM Deployer Role', status: 'fail', description: 'Role github-actions-deployer not found', fix });
+      send({
+        step: 5,
+        title: 'IAM Deployer Role',
+        status: 'fail',
+        description: 'Role github-actions-deployer not found',
+        fix,
+      });
     }
 
     // Step 6: SST bootstrap bucket
     const buckets = await listBucketsWithPrefix('sst-asset-', profile);
     if (buckets.length > 0) {
-      send({ step: 6, title: 'SST Bootstrap', status: 'pass', description: `Bootstrap bucket found: ${buckets[0]}` });
+      send({
+        step: 6,
+        title: 'SST Bootstrap',
+        status: 'pass',
+        description: `Bootstrap bucket found: ${buckets[0]}`,
+      });
     } else {
       send({
         step: 6,
@@ -143,7 +189,8 @@ export const awsCheckRoutes: FastifyPluginAsync = async (app) => {
       step: 7,
       title: 'ACM Certificate Region',
       status: 'warn',
-      description: 'CloudFront certificates must be issued in us-east-1 regardless of your primary region',
+      description:
+        'CloudFront certificates must be issued in us-east-1 regardless of your primary region',
       fix: '# When creating certificates for CloudFront:\naws acm request-certificate --region us-east-1 --domain-name yourdomain.com',
     });
 

@@ -118,7 +118,9 @@ function RadioGroup({ name, value, options, onChange }: RadioGroupProps) {
           />
           <div>
             <div style={{ fontSize: 13, color: '#e2e8f0', fontWeight: 500 }}>{opt.label}</div>
-            {opt.sub && <div style={{ fontSize: 12, color: '#718096', marginTop: 2 }}>{opt.sub}</div>}
+            {opt.sub && (
+              <div style={{ fontSize: 12, color: '#718096', marginTop: 2 }}>{opt.sub}</div>
+            )}
           </div>
         </label>
       ))}
@@ -182,7 +184,9 @@ export function InitWizard() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginTop: 0, marginBottom: 6 }}>
+      <h1
+        style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginTop: 0, marginBottom: 6 }}
+      >
         New Project Wizard
       </h1>
       <p style={{ fontSize: 14, color: '#718096', marginTop: 0, marginBottom: 24 }}>
@@ -211,20 +215,23 @@ export function InitWizard() {
           />
         </div>
         <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
-          {['Identity', 'Auth', ...(showTenantPhase ? ['Tenancy'] : []), 'CI/CD', 'Staging'].map((label, i) => (
-            <div
-              key={label}
-              style={{
-                flex: 1,
-                textAlign: 'center',
-                fontSize: 10,
-                color: i + 1 === phase ? '#6366f1' : i + 1 < phase ? '#10b981' : '#4a5568',
-                fontWeight: i + 1 === phase ? 700 : 400,
-              }}
-            >
-              {i + 1 < phase ? '✓ ' : ''}{label}
-            </div>
-          ))}
+          {['Identity', 'Auth', ...(showTenantPhase ? ['Tenancy'] : []), 'CI/CD', 'Staging'].map(
+            (label, i) => (
+              <div
+                key={label}
+                style={{
+                  flex: 1,
+                  textAlign: 'center',
+                  fontSize: 10,
+                  color: i + 1 === phase ? '#6366f1' : i + 1 < phase ? '#10b981' : '#4a5568',
+                  fontWeight: i + 1 === phase ? 700 : 400,
+                }}
+              >
+                {i + 1 < phase ? '✓ ' : ''}
+                {label}
+              </div>
+            ),
+          )}
         </div>
       </div>
 
@@ -239,7 +246,9 @@ export function InitWizard() {
                 style={inputStyle}
                 placeholder="my-project"
                 value={form.projectName}
-                onChange={(e) => set('projectName', e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+                onChange={(e) =>
+                  set('projectName', e.target.value.toLowerCase().replace(/\s+/g, '-'))
+                }
               />
               <p style={{ fontSize: 11, color: '#718096', margin: '4px 0 0' }}>
                 Lowercase letters, numbers, and hyphens only
@@ -253,7 +262,9 @@ export function InitWizard() {
                 onChange={(e) => set('awsRegion', e.target.value)}
               >
                 {AWS_REGIONS.map((r) => (
-                  <option key={r.value} value={r.value}>{r.label}</option>
+                  <option key={r.value} value={r.value}>
+                    {r.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -264,9 +275,21 @@ export function InitWizard() {
                 value={form.projectType}
                 onChange={(v) => set('projectType', v as FormData['projectType'])}
                 options={[
-                  { value: 'cms', label: 'Multi-tenant CMS', sub: 'Like ccms — DynamoDB, CloudFront, multi-tenant SSR' },
-                  { value: 'api', label: 'Single-tenant web app', sub: 'Cognito auth, Lambda API, CloudFront' },
-                  { value: 'static', label: 'API-only / Static site', sub: 'No SSR — Lambda + API Gateway' },
+                  {
+                    value: 'cms',
+                    label: 'Multi-tenant CMS',
+                    sub: 'Like ccms — DynamoDB, CloudFront, multi-tenant SSR',
+                  },
+                  {
+                    value: 'api',
+                    label: 'Single-tenant web app',
+                    sub: 'Cognito auth, Lambda API, CloudFront',
+                  },
+                  {
+                    value: 'static',
+                    label: 'API-only / Static site',
+                    sub: 'No SSR — Lambda + API Gateway',
+                  },
                 ]}
               />
             </div>
@@ -286,8 +309,16 @@ export function InitWizard() {
                 value={form.authStrategy}
                 onChange={(v) => set('authStrategy', v as FormData['authStrategy'])}
                 options={[
-                  { value: 'cognito-kms', label: 'Cognito + KMS hybrid JWT', sub: 'SPA auth + inline editor tokens (recommended for CMS)' },
-                  { value: 'cognito', label: 'Cognito only', sub: 'SPA auth — standard Cognito JWT flow' },
+                  {
+                    value: 'cognito-kms',
+                    label: 'Cognito + KMS hybrid JWT',
+                    sub: 'SPA auth + inline editor tokens (recommended for CMS)',
+                  },
+                  {
+                    value: 'cognito',
+                    label: 'Cognito only',
+                    sub: 'SPA auth — standard Cognito JWT flow',
+                  },
                   { value: 'none', label: 'None', sub: 'No authentication scaffolding' },
                 ]}
               />
@@ -320,8 +351,16 @@ export function InitWizard() {
                 value={form.tenantIsolation}
                 onChange={(v) => set('tenantIsolation', v as FormData['tenantIsolation'])}
                 options={[
-                  { value: 'single-table', label: 'Single-table DynamoDB', sub: 'Partition key: TENANT#<id> — recommended for most cases' },
-                  { value: 'separate-tables', label: 'Separate tables per tenant', sub: 'Stronger isolation, higher operational overhead' },
+                  {
+                    value: 'single-table',
+                    label: 'Single-table DynamoDB',
+                    sub: 'Partition key: TENANT#<id> — recommended for most cases',
+                  },
+                  {
+                    value: 'separate-tables',
+                    label: 'Separate tables per tenant',
+                    sub: 'Stronger isolation, higher operational overhead',
+                  },
                 ]}
               />
             </div>
@@ -332,8 +371,16 @@ export function InitWizard() {
                 value={form.expectedTenantCount}
                 onChange={(v) => set('expectedTenantCount', v as FormData['expectedTenantCount'])}
                 options={[
-                  { value: '<75', label: 'Fewer than 75', sub: 'Shared CloudFront distribution + SAN cert' },
-                  { value: '75+', label: '75+ tenants', sub: 'Plan for multiple distributions — SAN cert limit exceeded' },
+                  {
+                    value: '<75',
+                    label: 'Fewer than 75',
+                    sub: 'Shared CloudFront distribution + SAN cert',
+                  },
+                  {
+                    value: '75+',
+                    label: '75+ tenants',
+                    sub: 'Plan for multiple distributions — SAN cert limit exceeded',
+                  },
                 ]}
               />
             </div>
@@ -420,8 +467,25 @@ export function InitWizard() {
           </label>
 
           {/* Summary */}
-          <div style={{ marginTop: 20, padding: '14px 16px', background: '#0f1117', borderRadius: 6, border: '1px solid #2d3748' }}>
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#718096', margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div
+            style={{
+              marginTop: 20,
+              padding: '14px 16px',
+              background: '#0f1117',
+              borderRadius: 6,
+              border: '1px solid #2d3748',
+            }}
+          >
+            <p
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: '#718096',
+                margin: '0 0 10px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}
+            >
               Project Summary
             </p>
             {[
@@ -440,15 +504,14 @@ export function InitWizard() {
             ))}
           </div>
 
-          {error && (
-            <p style={{ marginTop: 12, color: '#ef4444', fontSize: 13 }}>Error: {error}</p>
-          )}
+          {error && <p style={{ marginTop: 12, color: '#ef4444', fontSize: 13 }}>Error: {error}</p>}
         </div>
       )}
 
       {/* Navigation */}
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
         <button
+          type="button"
           onClick={handleBack}
           disabled={phase === 1}
           style={{
@@ -467,6 +530,7 @@ export function InitWizard() {
 
         {phase < effectiveTotal ? (
           <button
+            type="button"
             onClick={handleNext}
             disabled={!canAdvance()}
             style={{
@@ -485,6 +549,7 @@ export function InitWizard() {
           </button>
         ) : (
           <button
+            type="button"
             onClick={handleGenerate}
             disabled={loading}
             style={{

@@ -1,13 +1,14 @@
 import { cac } from 'cac';
 import { runInit } from './commands/init.js';
-import { runSetupAws } from './commands/setup-aws.js';
 import { red } from './wizard/printer.js';
-
 
 const cli = cac('easy-aws-deploy');
 
 cli
-  .command('init <project-name>', 'Scaffold a new SST v3 project with production-grade AWS patterns')
+  .command(
+    'init <project-name>',
+    'Scaffold a new SST v3 project with production-grade AWS patterns',
+  )
   .option('--dry-run', 'Show what would be generated without writing files')
   .option('-y, --yes', 'Accept all defaults (non-interactive)')
   .action(async (projectName: string, options: { dryRun?: boolean; yes?: boolean }) => {

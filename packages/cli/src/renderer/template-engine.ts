@@ -38,7 +38,6 @@ function processConditionals(template: string, map: VarMap): string {
   return template.replace(blockRe, (_match, varName: string, body: string) => {
     const value = map[varName];
     if (!value) return '';
-    // Remove the leading line-comment markers from each line of the kept body.
     return body;
   });
 }

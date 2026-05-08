@@ -1,4 +1,4 @@
-import { mkdir, writeFile, access } from 'node:fs/promises';
+import { access, mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { GeneratedFile } from '../types.js';
 import { dim, green, yellow } from '../wizard/printer.js';

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StepCard } from '../components/StepCard.js';
 
 type Status = 'pass' | 'fail' | 'warn' | 'pending' | 'running';
@@ -41,7 +41,12 @@ const labelStyle: React.CSSProperties = {
 };
 
 export function Prerequisites() {
-  const [form, setForm] = useState<FormState>({ project: '', repo: '', branch: 'main', profile: '' });
+  const [form, setForm] = useState<FormState>({
+    project: '',
+    repo: '',
+    branch: 'main',
+    profile: '',
+  });
   const [results, setResults] = useState<CheckResult[]>([]);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
@@ -101,7 +106,9 @@ export function Prerequisites() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginTop: 0, marginBottom: 6 }}>
+      <h1
+        style={{ fontSize: 22, fontWeight: 700, color: '#e2e8f0', marginTop: 0, marginBottom: 6 }}
+      >
         AWS Prerequisites
       </h1>
       <p style={{ fontSize: 14, color: '#718096', marginTop: 0, marginBottom: 24 }}>
@@ -158,6 +165,7 @@ export function Prerequisites() {
         </div>
 
         <button
+          type="button"
           onClick={runChecks}
           disabled={running}
           style={{
